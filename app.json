@@ -1,0 +1,14 @@
+{
+  "pages": [
+    "index"
+  ],
+  "window": {
+    "navigationBarTitleText": "时间守护者",
+    "navigationBarBackgroundColor": "#6C63FF",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#F6F5FF",
+    "backgroundTextStyle": "dark"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

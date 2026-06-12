@@ -1,0 +1,102 @@
+<view class="page">
+  <view class="header">
+    <view>
+      <view class="app-title">时间守护者</view>
+      <view class="app-subtitle">像 Microsoft To Do 一样安排今天要做的事</view>
+    </view>
+    <view class="date-pill">{{todayText}}</view>
+  </view>
+
+  <view class="nav">
+    <view class="nav-item {{view === 'today' ? 'active' : ''}}" data-view="today" bindtap="switchView">
+      <text>我的今天</text>
+      <text>{{counts.today}}</text>
+    </view>
+    <view class="nav-item {{view === 'important' ? 'active' : ''}}" data-view="important" bindtap="switchView">
+      <text>重要</text>
+      <text>{{counts.important}}</text>
+    </view>
+    <view class="nav-item {{view === 'planned' ? 'active' : ''}}" data-view="planned" bindtap="switchView">
+      <text>有提醒</text>
+      <text>{{counts.planned}}</text>
+    </view>
+    <view class="nav-item {{view === 'done' ? 'active' : ''}}" data-view="done" bindtap="switchView">
+      <text>已完成</text>
+      <text>{{counts.done}}</text>
+    </view>
+  </view>
+
+  <view class="panel">
+    <view class="section-title">{{title}}</view>
+    <view class="composer">
+      <input
+        class="task-input"
+        value="{{inputText}}"
+        bindinput="onInput"
+        bindconfirm="addTask"
+        confirm-type="done"
+        placeholder="例如：下午3点提醒我开会，或 买牛奶"
+      />
+      <button class="add-btn" bindtap="addTask">添加</button>
+    </view>
+    <view class="hint">输入任务时可以带提醒时间，例如“明天上午9点提醒我交材料”。</view>
+  </view>
+
+  <view class="toolbar">
+    <button class="light-btn" bindtap="toggleBulk">{{bulk ? '退出批量' : '批量选择'}}</button>
+    <block wx:if="{{bulk}}">
+      <button class="light-btn" bindtap="selectAll">全选</button>
+      <button class="danger-btn" bindtap="deleteSelected">删除所选</button>
+      <text class="selected-count">已选 {{selectedIds.length}} 项</text>
+    </block>
+  </view>
+
+  <view class="task-list">
+    <block wx:if="{{visibleTasks.length}}">
+      <view wx:for="{{visibleTasks}}" wx:key="id" class="task-card {{item.done ? 'done' : ''}}">
+        <view wx:if="{{bulk}}" class="select-box {{item.selected ? 'checked' : ''}}" data-id="{{item.id}}" bindtap="toggleSelected">
+          {{item.selected ? '✓' : ''}}
+        </view>
+        <view wx:else class="check-box {{item.done ? 'checked' : ''}}" data-id="{{item.id}}" bindtap="toggleDone">
+          {{item.done ? '✓' : ''}}
+        </view>
+
+        <view class="task-main" data-id="{{item.id}}" bindtap="openEdit">
+          <view class="task-title">{{item.title}}</view>
+          <view class="task-meta">
+            <text wx:if="{{item.reminderText}}" class="tag">提醒 {{item.reminderText}}</text>
+            <text wx:if="{{item.important}}" class="tag important">重要</text>
+            <text wx:if="{{item.done}}" class="tag done-tag">已完成</text>
+          </view>
+        </view>
+
+        <view class="actions">
+          <button class="icon-btn {{item.important ? 'active' : ''}}" data-id="{{item.id}}" bindtap="toggleImportant">★</button>
+          <button class="icon-btn" data-id="{{item.id}}" bindtap="openEdit">编辑</button>
+          <button wx:if="{{item.reminderAt}}" class="icon-btn" data-id="{{item.id}}" bindtap="addCalendar">日历</button>
+          <button class="icon-btn danger" data-id="{{item.id}}" bindtap="deleteTask">删除</button>
+        </view>
+      </view>
+    </block>
+    <view wx:else class="empty">
+      <view class="empty-title">这里还没有任务</view>
+      <view class="empty-text">先添加一件今天要做的事，保持轻一点也很好。</view>
+    </view>
+  </view>
+
+  <view wx:if="{{editingId}}" class="modal-mask">
+    <view class="modal">
+      <view class="modal-title">编辑任务</view>
+      <view class="field-label">任务内容</view>
+      <input class="modal-input" value="{{editTitle}}" bindinput="editTitleInput" placeholder="任务名称" />
+      <view class="field-label">提醒时间</view>
+      <input class="modal-input" value="{{editReminder}}" bindinput="editReminderChange" placeholder="2026-06-12 15:00，可留空" />
+      <view class="modal-note">提醒会保存在小程序内。需要系统级提醒时，可点任务右侧“日历”。</view>
+      <view class="modal-actions">
+        <button class="light-btn" bindtap="closeEdit">取消</button>
+        <button class="light-btn" bindtap="clearReminder">清除提醒</button>
+        <button class="add-btn" bindtap="saveEdit">保存</button>
+      </view>
+    </view>
+  </view>
+</view>
